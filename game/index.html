@@ -1,0 +1,91 @@
+<style>
+body { font-family: monospace;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/ipfs@0.31.7/dist/index.js"></script>
+<script type="text/javascript">
+var id = 'ipfs-repo-' + String(Math.random())
+console.log({id})
+const node = new Ipfs({
+repo: id,
+EXPERIMENTAL: {
+  pubsub: true
+},
+config: {
+  Addresses: {
+    Swarm: [
+      '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+    ]
+  }
+}
+})
+let myid = ''
+let topic = 'jslovers-game'
+let peers = []
+let guesses = {}
+let names = {}
+node.on('ready', function() {
+  console.log('ready')
+  node.id((err, id) => {
+    myid = id.id
+  })
+
+  let receiveMsg = function(msg) {
+    // console.log(msg.data.toString(), Date.now())
+    guesses[msg.from.slice(0, 10)] = msg.data.toString().split('###')[1]
+    names[msg.from.slice(0, 10)] = msg.data.toString().split('###')[0]
+  }
+  node.pubsub.subscribe(topic, receiveMsg)
+
+  setInterval(function() {
+    node.pubsub.peers(topic, (err, peerIds) => {
+      if (err) {
+        throw err
+      }
+      peers = peerIds
+      document.querySelector('#online').innerHTML = peerIds.length + 1 + ' online'
+    })
+    send()
+  }, 1000)
+})
+
+setInterval(() => {
+  let fullList = [myid].concat(peers);
+  peersList.innerHTML = fullList.map(peer => {
+    let shortid = peer.slice(0, 10)
+    let name = names[shortid] || shortid
+    return `<tr><td>${name}</td><td>${guesses[shortid] || ''}</td></tr>`
+  }).join('')
+}, 1000/30)
+
+function send() {
+  const message = document.querySelector('#message').value
+  const name = document.querySelector('#name').value
+  node.pubsub.publish(topic, new node.types.Buffer(name + '###' + message))
+}
+function findWinner() {
+  let winnerNumber = Math.floor(Math.random() * 1000000) + 1
+  console.log({winnerNumber})
+  let winner = Object.keys(guesses).reduce((bestguess, guess) => {
+    const dist = Math.abs(guesses[guess] - winnerNumber)
+    if(bestguess.distance > dist) {
+      return {
+        winnerId: guess,
+        distance: dist
+      }
+    } else {
+      return bestguess
+    }
+  }, {winnerId: '', distance: 1000000})
+
+  return {name: names[winner.winnerId], winner};
+}
+</script>
+<h1>🎲 JSLovers Lotto 🎲</h1>
+<h3>Guess between 1 & 1 Million</h3>
+<div id="online"></div>
+My name: <input type="text"/ id="name">
+My guess: <input type="text"/ id="message">
+<hr>
+<table>
+  <tbody id="peersList"></tbody>
+</table>

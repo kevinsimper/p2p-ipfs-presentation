@@ -1,0 +1,48 @@
+<script src="https://cdn.jsdelivr.net/npm/ipfs@0.31.7/dist/index.js"></script>
+<script type="text/javascript">
+var id = 'ipfs-repo-' + String(Math.random())
+console.log({id})
+const node = new Ipfs({
+repo: id,
+EXPERIMENTAL: {
+  pubsub: true
+},
+config: {
+  Addresses: {
+    Swarm: [
+      '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+    ]
+  }
+}
+})
+let topic = 'jslovers'
+
+node.on('ready', function() {
+  console.log('ready')
+
+  let receiveMsg = function(msg) {
+    console.log(msg.data.toString(), Date.now())
+    document.querySelector('#messages').innerHTML += '<div>' + msg.from.slice(0, 10) + ': ' + msg.data.toString() + '</div>'
+  }
+  node.pubsub.subscribe(topic, receiveMsg)
+
+  setInterval(function() {
+    node.pubsub.peers(topic, (err, peerIds) => {
+      if (err) {
+        throw err
+      }
+      document.querySelector('#online').innerHTML = peerIds.length + 1 + ' online'
+    })
+  }, 1000)
+})
+
+function send() {
+  const message = document.querySelector('#message').value
+  node.pubsub.publish(topic, new node.types.Buffer(message))
+  document.querySelector('#message').value = ''
+}
+</script>
+<h1>JSLovers Chat</h1>
+<div id="online"></div>
+<input type="text"/ id="message"><button onclick="send();">Send</button>
+<div id="messages"></div>

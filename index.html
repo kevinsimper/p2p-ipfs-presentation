@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Docker</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Handlee:400,600);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url('https://fonts.googleapis.com/css?family=Amatic+SC:400,700');
+
+      body { font-family: 'Droid Serif'; }
+      .remark-slide-content h1 {
+        font-size: 76px;
+
+      }
+      h1, h2, h3 {
+        font-family: 'Droid Serif';
+        /*font-family: 'Amatic SC';*/
+        font-weight: 600;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      img {
+        max-width: 100%;
+        width: 100%;
+      }
+      .remark-slide-content.black {
+        background-color: #000;
+        color: #FFF;
+      }
+      .remark-slide-content.blue {
+        background-color: #0074D9;
+        color: #FFF;
+      }
+      .remark-slide-content.orange {
+        background-color: #FF5722;
+        color: #FFF;
+      }
+      @page {
+  size: 1024px 768px;
+  margin: 0;
+}
+
+@media print {
+  .remark-slide-scaler {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1) !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      fetch('index.md').then(r => r.text()).then(r => {
+        let mark = r
+        document.getElementById('source').innerHTML = mark
+        var slideshow = remark.create();
+      })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>img { width: 100%;}</style>
+  </head>
+  <body>
+    <input id="text"/><button onclick="load()">Load</button>
+    <div id="status">Loading</div>
+    <img src="" id="pic"/>
+    <script src="https://cdn.jsdelivr.net/npm/ipfs@0.31.7/dist/index.js"></script>
+    <script>
+    const status = document.querySelector('#status')
+    const repo = "Kevin" + Math.random()
+    const node = new Ipfs({
+      repo,
+      EXPERIMENTAL: {
+        pubsub: true
+      },
+      config: {
+        Addresses: {
+          Swarm: [
+            '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+          ]
+        }
+      }
+    })
+    node.on('ready', () => {
+      status.innerHTML = 'Ready'
+    })
+    function load() {
+      node.files.get(text.value, (err, files) => {
+        console.log({err, files})
+        let blob = new Blob( [ files[0].content ], { type: "image/png" } );
+        var imageUrl = URL.createObjectURL( blob );
+        pic.src = imageUrl;
+      })
+    }
+    </script>
+  </body>
+</html>
